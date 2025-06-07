@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 import mod1  # XRPL wallet functions
 import mod2  # Token/currency functions  
+from escrow_utils import create_escrow, finish_escrow, cancel_escrow
 
 class CrowdfundingPlatform:
     def __init__(self):
@@ -124,13 +125,15 @@ class CrowdfundingPlatform:
         
         print(f"\n💰 Processing investment of {investment_amount} XRP...")
         
-        # Step 1: Send XRP to farmer
-        print("   Sending XRP to farmer...")
-        xrp_result = mod1.send_xrp(investor_seed, investment_amount, farmer_address)
-        
-        if "Submit failed" in str(xrp_result):
-            print(f"❌ XRP transfer failed: {xrp_result}")
-            return
+        # Step 1: Lock XRP in escrow (lockbox)
+        print("   Locking XRP in escrow (lockbox)...")
+        escrow_info = create_escrow(
+            investor_seed,
+            investment_amount,
+            farmer_address,
+            finish_after_sec=120  # For demo: escrow unlocks in 2 min
+        )
+        print(f"Escrow created. Tx hash: {escrow_info['tx_hash']}, Sequence: {escrow_info['sequence']}")
             
         # Step 2: Create trust line for investor to receive tokens
         print("   Creating trust line for tokens...")
@@ -148,7 +151,10 @@ class CrowdfundingPlatform:
             'investor_address': investor_wallet.address,
             'amount': investment_amount,
             'token_id': None,
-            'created_at': datetime.now().isoformat()
+            'created_at': datetime.now().isoformat(),
+            'escrow_sequence': escrow_info['sequence'],
+            'escrow_owner': investor_wallet.address,
+            'escrow_tx_hash': escrow_info['tx_hash']
         }
         
         data['investments'].append(investment)
@@ -202,3 +208,29 @@ class CrowdfundingPlatform:
             print("   Token Balances:")
             for currency, amount in balance_info['balances'].items():
                 print(f"     {currency}: {amount}")
+
+    def release_escrow(self, investment_id, admin_seed):
+        """Admin: Release escrow for an investment (after finish_after time)"""
+        data = self.load_data()
+        investment = next((i for i in data['investments'] if i['id'] == investment_id), None)
+        if not investment:
+            print("❌ Investment not found")
+            return
+        owner = investment['escrow_owner']
+        sequence = investment['escrow_sequence']
+        print(f"   Releasing escrow for investment {investment_id} ...")
+        result = finish_escrow(admin_seed, owner, sequence)
+        print(result)
+
+    def cancel_escrow(self, investment_id, admin_seed):
+        """Admin: Cancel escrow for an investment (refund)"""
+        data = self.load_data()
+        investment = next((i for i in data['investments'] if i['id'] == investment_id), None)
+        if not investment:
+            print("❌ Investment not found")
+            return
+        owner = investment['escrow_owner']
+        sequence = investment['escrow_sequence']
+        print(f"   Cancelling escrow for investment {investment_id} ...")
+        result = cancel_escrow(admin_seed, owner, sequence)
+        print(result)

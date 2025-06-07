@@ -8,8 +8,10 @@ def display_menu():
     print("2. List Campaigns") 
     print("3. Approve Campaign (Admin)")
     print("4. Invest in Campaign")
-    print("5. Check Wallet Balance")
-    print("6. Exit")
+    print("5. Release Escrow (Admin)")
+    print("6. Cancel Escrow (Admin)")
+    print("7. Check Wallet Balance")
+    print("8. Exit")
 
 def handle_create_campaign(platform):
     """Handle campaign creation"""
@@ -42,13 +44,25 @@ def handle_check_balance(platform):
     wallet_seed = input("Wallet seed: ")
     platform.check_balances(wallet_seed)
 
+def handle_release_escrow(platform):
+    """Admin: Release escrow for investment"""
+    inv_id = int(input("Investment ID to release escrow: "))
+    admin_seed = input("Admin wallet seed: ")
+    platform.release_escrow(inv_id, admin_seed)
+
+def handle_cancel_escrow(platform):
+    """Admin: Cancel escrow for investment"""
+    inv_id = int(input("Investment ID to cancel escrow: "))
+    admin_seed = input("Admin wallet seed: ")
+    platform.cancel_escrow(inv_id, admin_seed)
+
 def cli_handle():
     """Main CLI handler"""
     platform = CrowdfundingPlatform()
     
     while True:
         display_menu()
-        choice = input("\nSelect option (1-6): ").strip()
+        choice = input("\nSelect option (1-8): ").strip()
         
         if choice == "1":
             handle_create_campaign(platform)
@@ -59,8 +73,12 @@ def cli_handle():
         elif choice == "4":
             handle_investment(platform)
         elif choice == "5":
-            handle_check_balance(platform)
+            handle_release_escrow(platform)
         elif choice == "6":
+            handle_cancel_escrow(platform)
+        elif choice == "7":
+            handle_check_balance(platform)
+        elif choice == "8":
             print("👋 Goodbye!")
             break
         else:
