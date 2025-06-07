@@ -11,9 +11,21 @@
       "token_currency": "COW",
       "status": "approved",
       "created_at": "2025-06-07T15:27:17.368020"
+    },
+    {
+      "id": 2,
+      "farmer_name": "Test",
+      "project_title": "Test",
+      "description": "Test",
+      "funding_goal": 1000,
+      "farmer_wallet_seed": "sEdTW3oR3cPqvixUj4vVcxWoagUdpC6",
+      "farmer_address": "rsko46qR4LW7snGC8c8XGBKQjUvEzm8Q81",
+      "token_currency": "TES",
+      "status": "approved",
+      "created_at": "2025-06-08T01:13:18.670563"
     }
   ],
   "investments": [],
-  "next_campaign_id": 2,
+  "next_campaign_id": 3,
   "next_investment_id": 1
 }

@@ -1,9 +1,9 @@
 import json
 import os
 from datetime import datetime
-import mod1  # XRPL wallet functions
-import mod2  # Token/currency functions  
-from escrow_utils import create_escrow, finish_escrow, cancel_escrow
+from mods.escrow_utils import create_escrow, finish_escrow, cancel_escrow
+from mods.nft_utils import mint_nft, get_nfts, transfer_nft, burn_nft
+
 
 class CrowdfundingPlatform:
     def __init__(self):
@@ -131,7 +131,7 @@ class CrowdfundingPlatform:
             investor_seed,
             investment_amount,
             farmer_address,
-            finish_after_sec=120  # For demo: escrow unlocks in 2 min
+            finish_after_sec = 120  # demo: escrow unlocks in 2 min
         )
         print(f"Escrow created. Tx hash: {escrow_info['tx_hash']}, Sequence: {escrow_info['sequence']}")
             
@@ -144,6 +144,12 @@ class CrowdfundingPlatform:
         token_amount = investment_amount  # 1:1 ratio for MVP
         token_result = mod2.send_currency(farmer_seed, investor_wallet.address, token_currency, token_amount)
         
+        # Mint NFT receipt for investor
+        nft_uri = f"https://yourplatform.org/receipts/campaign{campaign_id}_investment{data['next_investment_id']}"
+        print(f"   Minting NFT receipt for backer: {nft_uri}")
+        nft_id, nft_result = mint_nft(investor_seed, nft_uri)
+        print(f"   NFT minted! ID: {nft_id}")
+
         # Record investment
         investment = {
             'id': data['next_investment_id'],
@@ -154,7 +160,10 @@ class CrowdfundingPlatform:
             'created_at': datetime.now().isoformat(),
             'escrow_sequence': escrow_info['sequence'],
             'escrow_owner': investor_wallet.address,
-            'escrow_tx_hash': escrow_info['tx_hash']
+            'escrow_tx_hash': escrow_info['tx_hash'],
+            'nft_id': nft_id,
+            'nft_uri': nft_uri,
+    
         }
         
         data['investments'].append(investment)
