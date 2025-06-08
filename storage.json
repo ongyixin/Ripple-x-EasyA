@@ -23,9 +23,20 @@
       "token_currency": "TES",
       "status": "approved",
       "created_at": "2025-06-08T01:13:18.670563"
+    },
+    {
+      "id": 3,
+      "farmer_name": "John",
+      "project_title": "Tulip Farm",
+      "description": "Growing tulips for spring season",
+      "funding_goal": 500,
+      "farmer_address": "rnN753Rzb76ueDv5QxpjJEfbTeb8eBbF6R",
+      "token_currency": "TUL",
+      "status": "approved",
+      "created_at": "2025-06-08T11:08:09.738834"
     }
   ],
   "investments": [],
-  "next_campaign_id": 3,
+  "next_campaign_id": 4,
   "next_investment_id": 1
 }

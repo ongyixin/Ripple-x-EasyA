@@ -4,24 +4,22 @@ from xrpl.models.requests import AccountLines
 
 testnet_url = "https://s.devnet.rippletest.net:51234/"
 
-def get_account(seed):
-    """get_account"""
-    client = xrpl.clients.JsonRpcClient(testnet_url)
-    if (seed == ''):
-        new_wallet = xrpl.wallet.generate_faucet_wallet(client)
-    else:
-        new_wallet = xrpl.wallet.Wallet.from_seed(seed)
-    return new_wallet
+def get_account_info(address):
+    from xrpl.clients import JsonRpcClient
+    from xrpl.models.requests.account_info import AccountInfo
 
-def get_account_info(accountId):
-    """get_account_info"""
-    client = xrpl.clients.JsonRpcClient(testnet_url)
-    acct_info = xrpl.models.requests.account_info.AccountInfo(
-        account=accountId,
-        ledger_index="validated"
+    client = JsonRpcClient("https://s.altnet.rippletest.net:51234")
+    req = AccountInfo(
+        account=address,
+        ledger_index="validated",
+        strict=True
     )
-    response = client.request(acct_info)
-    return response.result['account_data']
+    response = client.request(req)
+    if "account_data" in response.result:
+        return response.result["account_data"]
+    else:
+        print(f"❌ XRPL account {address} not found or not funded yet.")
+        return None
 
 def send_xrp(seed, amount, destination):
     sending_wallet = xrpl.wallet.Wallet.from_seed(seed)

@@ -1,11 +1,15 @@
 from src.crowdfunding_platform import CrowdfundingPlatform
 from mods.credential_utils import issue_crop_credential, lookup_credentials
 from mods.nft_batch import batch_mint
-from mods.wallet import get_account
 from mods.wallet import get_iou_balances
+from mods.nft_utils import (
+    get_nfts_for_address,  
+    prepare_nft_transfer_tx, 
+    prepare_nft_burn_tx,
+)
+import json
 
 def display_menu():
-    """Display the main menu"""
     print("\n🌾 FARMER CROWDFUNDING PLATFORM 🌾")
     print("1. Create Campaign")
     print("2. List Campaigns") 
@@ -22,90 +26,90 @@ def display_menu():
     print("13. Invest via Check")
     print("14. Batch Mint NFTs")
     print("15. Check IOU Balances")
-    print("16. Exit")
+    print ("16. Display Trustlines")
+    print("17. Exit")
 
 def handle_create_campaign(platform):
-    """Handle campaign creation"""
     farmer_name = input("Farmer name: ")
     project_title = input("Project title: ")
     description = input("Project description: ")
     funding_goal = int(input("Funding goal (XRP): "))
-    platform.create_campaign(farmer_name, project_title, description, funding_goal)
+    farmer_address = input("Farmer XRPL public address: ").strip()
+    platform.create_campaign(farmer_name, project_title, description, funding_goal, farmer_address)
 
 def handle_approve_campaign(platform):
-    """Handle campaign approval"""
     campaign_id = int(input("Campaign ID to approve: "))
     platform.approve_campaign(campaign_id)
 
 def handle_investment(platform):
     campaign_id = int(input("Campaign ID to invest in: "))
-    investor_seed = input("Your wallet seed (or press Enter for new wallet): ").strip()
-    if not investor_seed:
-        new_wallet = get_account('')
-        investor_seed = new_wallet.seed
-        print(f"New wallet created: {new_wallet.address}")
-        print(f"Your seed (save this!): {investor_seed}")
-    
+    investor_address = input("Your XRPL public address: ").strip()
     amount = int(input("Investment amount (XRP): "))
-    platform.invest_in_campaign(campaign_id, investor_seed, amount)
+    platform.invest_in_campaign(campaign_id, investor_address, amount)
+    print("\nPlease sign and submit the displayed unsigned transactions using your wallet (e.g., XUMM, browser extension).")
 
 def handle_check_balance(platform):
-    """Handle balance checking"""
-    wallet_seed = input("Wallet seed: ")
-    platform.check_balances(wallet_seed)
+    wallet_address = input("Wallet XRPL address: ")
+    platform.check_balances(wallet_address)
 
 def handle_release_escrow(platform):
-    """Admin: Release escrow for investment"""
     inv_id = int(input("Investment ID to release escrow: "))
-    admin_seed = input("Admin wallet seed: ")
-    platform.release_escrow(inv_id, admin_seed)
+    finisher_address = input("XRPL address (who will sign EscrowFinish): ")
+    platform.provide_escrow_finish_instructions(inv_id, finisher_address)
+    print("\nPlease sign and submit the displayed unsigned transaction using your wallet.")
 
 def handle_cancel_escrow(platform):
-    """Admin: Cancel escrow for investment"""
     inv_id = int(input("Investment ID to cancel escrow: "))
-    admin_seed = input("Admin wallet seed: ")
-    platform.cancel_escrow(inv_id, admin_seed)
+    canceller_address = input("XRPL address (who will sign EscrowCancel): ")
+    platform.provide_escrow_cancel_instructions(inv_id, canceller_address)
+    print("\nPlease sign and submit the displayed unsigned transaction using your wallet.")
 
 def handle_view_nfts():
-    seed = input("Wallet seed to view NFTs: ")
-    nfts = get_nfts(seed)
+    address = input("XRPL address to view NFTs: ")
+    nfts = get_nfts_for_address(address)
     if not nfts:
         print("No NFTs found.")
     else:
         print("Your NFTs:")
         for i, nft in enumerate(nfts):
-            print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {xrpl.utils.hex_to_str(nft['URI'])}")
+            from xrpl.utils import hex_to_str
+            print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {hex_to_str(nft['URI'])}")
 
 def handle_transfer_nft():
-    seed = input("Your wallet seed: ")
-    nfts = get_nfts(seed)
+    address = input("Your XRPL address: ")
+    nfts = get_nfts_for_address(address)
     if not nfts:
         print("No NFTs found to transfer.")
         return
     for i, nft in enumerate(nfts):
-        print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {xrpl.utils.hex_to_str(nft['URI'])}")
+        from xrpl.utils import hex_to_str
+        print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {hex_to_str(nft['URI'])}")
     idx = int(input("Select NFT number to transfer: ")) - 1
-    dest = input("Destination address: ")
+    dest = input("Destination XRPL address: ")
     nft_id = nfts[idx]['NFTokenID']
-    resp = transfer_nft(seed, dest, nft_id)
-    print("Transfer offer submitted. TX result:")
-    print(resp)
+    tx = prepare_nft_transfer_tx(address, dest, nft_id)
+    print("\nUnsigned NFT transfer transaction:")
+    print(json.dumps(tx, indent=2))
+    print("Sign and submit this transaction with your wallet (e.g., XUMM, browser extension).")
 
 def handle_burn_nft():
-    seed = input("Your wallet seed: ")
-    nfts = get_nfts(seed)
+    address = input("Your XRPL address: ")
+    nfts = get_nfts_for_address(address)
     if not nfts:
         print("No NFTs found to burn.")
         return
     for i, nft in enumerate(nfts):
-        print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {xrpl.utils.hex_to_str(nft['URI'])}")
+        from xrpl.utils import hex_to_str
+        print(f"{i+1}) ID: {nft['NFTokenID']} | URI: {hex_to_str(nft['URI'])}")
     idx = int(input("Select NFT number to burn: ")) - 1
     nft_id = nfts[idx]['NFTokenID']
-    resp = burn_nft(seed, nft_id)
-    print("Burn submitted. TX result:")
-    print(resp)
+    tx = prepare_nft_burn_tx(address, nft_id)
+    print("\nUnsigned NFT burn transaction:")
+    print(json.dumps(tx, indent=2))
+    print("Sign and submit this transaction with your wallet (e.g., XUMM, browser extension).")
 
 def handle_submit_crop_credential():
+    # ADMIN/ORACLE ONLY
     issuer_seed = input("Issuer (admin/oracle) seed: ")
     farmer_address = input("Farmer XRPL address: ")
     cred_type = input("Credential type (e.g. CropHealthy20240610): ")
@@ -139,6 +143,7 @@ def handle_view_credentials():
         print()
 
 def handle_invest_via_check():
+    # ADMIN/ADVANCED ONLY (non-standard user flow)
     seed = input("Backer wallet seed: ")
     amount = input("Amount: ")
     dest = input("Farmer address: ")
@@ -151,6 +156,7 @@ def handle_invest_via_check():
     print(resp)
 
 def handle_batch_nft_mint():
+    # ADMIN/ADVANCED ONLY
     seed = input("Minter wallet seed: ")
     uri = input("NFT metadata URI: ")
     flags = input("Flags (usually 8 for transferable): ")
@@ -170,12 +176,15 @@ def handle_check_iou_balances():
         for iou in ious:
             print(f"{iou['currency']} issued by {iou['account']}: Balance {iou['balance']}")
 
+def handle_display_trustlines(platform):
+    address = input("XRPL address to display trustlines: ").strip()
+    platform.display_trustlines(address)
+
 def cli_handle():
     platform = CrowdfundingPlatform()
-
     while True:
         display_menu()
-        choice = input("\nSelect option (1-16): ").strip()
+        choice = input("\nSelect option (1-17): ").strip()
         if choice == "1":
             handle_create_campaign(platform)
         elif choice == "2":
@@ -207,6 +216,8 @@ def cli_handle():
         elif choice == "15":
             handle_check_iou_balances()
         elif choice == "16":
+            handle_display_trustlines(platform)
+        elif choice == "17":
             print("👋 Goodbye!")
             break
         else:
