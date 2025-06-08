@@ -18,6 +18,20 @@ The XRP Ledger is crucial for AgriVest's efficiency, transparency, and global re
 * Transparency and Immutability: Every transaction is recorded on the public and immutable XRPL, providing an unalterable audit trail and building trust.
 * Scalability: XRPL's high transaction capacity ensures AgriVest can scale effectively as more projects and investors join.
 
+## XRP Ledger Integration & Technical Architecture
+
+### Core Blockchain Features:
+* Escrow System: Uses XRP Ledger's escrow for time-locked or condition-based fund releases
+* Custom Token Issuance: Generates project-specific tokens for investors at a 1:1 XRP ratio
+* Trust Lines: Automatically created for seamless and transparent token transfers
+* NFT Integration: Mints NFT receipts for each investment
+
+### Technical Implementation:
+* JSON-based storage for campaign and investment data
+* Automatic XRPL wallet generation for farmers
+* Multi-signature security for campaign approval and fund management
+* Real-time tracking of XRP and token balance
+
 ## Impact
 AgriVest is more than an app; it's a commitment to empowering smallholder farmers. By providing direct capital, promoting transparency, and fostering sustainable practices, we aim to:
 
