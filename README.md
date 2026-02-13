@@ -42,7 +42,7 @@ AgriVest is more than an app; it's a commitment to empowering smallholder farmer
 
 ## Screenshots
 
-> Note: The frontend of the project can be accessed [HERE]([url](https://github.com/travisim/Farmify))).
+> Note: The frontend of the project can be accessed [HERE](https://github.com/travisim/Farmify).
 
 The demonstration of the backend is on CLI for simplicity.
 
