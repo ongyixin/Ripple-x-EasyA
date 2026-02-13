@@ -42,8 +42,26 @@ AgriVest is more than an app; it's a commitment to empowering smallholder farmer
 
 ## Screenshots
 
-> Note: The frontend of the project can be accessed [HERE](https://github.com/travisim/Farmify).
+> Note: The frontend components for the project can be accessed [HERE](https://github.com/travisim/Farmify).
 
-The demonstration of the backend is on CLI for simplicity.
+<img width="465" height="801" alt="image" src="https://github.com/user-attachments/assets/cfa02581-8574-4bf0-a5f7-2f0152d7d886" />
+
+<img width="492" height="799" alt="image" src="https://github.com/user-attachments/assets/d2c138d6-4c8e-4cb0-9ca7-b7d4af96284c" />
+
+<img width="516" height="803" alt="image" src="https://github.com/user-attachments/assets/fd0a971f-6f93-44ff-ac2a-8f6984327070" />
+
+<img width="453" height="800" alt="image" src="https://github.com/user-attachments/assets/b4af1e86-fa10-41e9-a79e-f49d65394266" />
+
+<img width="510" height="665" alt="image" src="https://github.com/user-attachments/assets/40a5a0e6-c2a7-4af8-8560-c29ffe464720" />
+
+<img width="505" height="662" alt="image" src="https://github.com/user-attachments/assets/20595655-5502-4b3a-80e2-3dc53c101413" />
+
+<img width="500" height="593" alt="image" src="https://github.com/user-attachments/assets/3d0a9756-ff92-413a-9dfa-1d636d15e690" />
+
+<img width="504" height="605" alt="image" src="https://github.com/user-attachments/assets/73aa815e-3d22-4b41-8420-6546035fb18e" />
+
+<img width="507" height="664" alt="image" src="https://github.com/user-attachments/assets/54280baa-3464-423b-a7ff-3ab3c1ef51b8" />
+
+The demonstration for the backend is executed on CLI for simplicity.
 
 ![5](images/5.jpeg)
